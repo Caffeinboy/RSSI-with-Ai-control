@@ -2,9 +2,9 @@
 // PUBLISHER (TRANSMITTER)
 // ==========================
 
-#define BLYNK_TEMPLATE_ID "TMPL3y7x7Y68_"
+#define BLYNK_TEMPLATE_ID "TMPL3y7-name"
 #define BLYNK_TEMPLATE_NAME "publisher"
-#define BLYNK_AUTH_TOKEN "vo8Nm7akPFDS-sSs6RV-3u08HcgmxZay"
+#define BLYNK_AUTH_TOKEN "vo8Nm7akPFDS"
 
 #include <WiFi.h>
 #include <BlynkSimpleEsp32.h>
@@ -13,8 +13,8 @@
 #include <Adafruit_SSD1306.h>
 #include <time.h>
 
-char ssid[] = "FIGMARK INFOTEK";
-char pass[] = "Fig1350!MIMO#";
+char ssid[] = "wifi_userid";
+char pass[] = "wifi_password";
 
 // ---------------- OLED ----------------
 #define SCREEN_WIDTH 128
