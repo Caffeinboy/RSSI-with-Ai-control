@@ -1,155 +1,226 @@
-# RSSI with AI Control
+# RSSI-Based Smart Relay Control System with AI Crowd Monitoring
 
-## Project Overview
+An ESP32-based dual-node automation system using WiFi RSSI, Blynk IoT, OLED monitoring, and relay control with AI-based people detection support.
 
-This project focuses on **RSSI (Received Signal Strength Indicator) based control using AI techniques** for intelligent decision-making and automation. The system measures signal strength values from wireless communication modules and uses AI-based logic to improve control, positioning, response accuracy, and adaptive performance.
+This project uses two ESP32 modules:
 
-The project is designed for applications such as:
+- **Publisher (Transmitter)** → Monitors WiFi RSSI, manages system activation, sends relay selection, AI status, and people count to Blynk
+- **Receiver** → Receives Blynk virtual pin updates, controls 5 relays, and displays live system status on OLED
 
-* Smart navigation systems
-* Indoor positioning systems
-* Wireless tracking
-* Signal-based automation
-* Autonomous decision systems
-* IoT monitoring and control
+The system automatically enables/disables relay control based on WiFi signal strength (RSSI threshold) and supports AI crowd monitoring integration using Virtual Pins V5 and V6.
 
 ---
 
-## Objective
+# Features
 
-The main objective of this project is to:
+## Publisher (Transmitter)
 
-* Monitor RSSI values from wireless devices
-* Analyze signal strength variations
-* Apply AI-based decision-making for better control
-* Improve system reliability and response speed
-* Reduce manual intervention using intelligent automation
+- WiFi RSSI monitoring
+- Automatic system activation using RSSI threshold
+- Blynk Virtual Pin control
+- OLED live status display
+- NTP real-time clock display
+- Boot animation on OLED
+- WiFi connection animation
+- Non-blocking WiFi + Blynk reconnect logic
+- AI status publishing
+- Headcount publishing
+- Serial Monitor debugging
 
----
+## Receiver
 
-## Features
-
-* Real-time RSSI monitoring
-* AI-assisted signal analysis
-* Automatic control response
-* Adaptive threshold adjustment
-* Improved signal stability handling
-* Wireless communication support
-* IoT-compatible architecture
-* Expandable for multiple sensor nodes
-
----
-
-## Hardware Requirements
-
-* ESP32 / ESP8266 / Microcontroller
-* Wireless communication module (Wi-Fi / Bluetooth / RF)
-* Power supply unit
-* Sensors (if required)
-* Relay / Motor driver (for control output)
-* Display module (optional)
-* Breadboard / PCB setup
+- Receives Blynk virtual pin updates
+- Controls 5 relay outputs
+- OLED live monitoring display
+- NTP real-time clock
+- AI status display
+- Headcount display
+- WiFi + Blynk connection monitoring
+- Auto-sync after reconnect
+- Non-blocking reconnect logic
+- Serial Monitor debugging
 
 ---
 
-## Software Requirements
+# Virtual Pins Used
 
-* Arduino IDE
-* Embedded C / C++
-* Python (for AI model training if used)
-* Serial Monitor
-* Git & GitHub
-* Blynk / IoT platform (optional)
-
----
-
-## Working Principle
-
-1. The wireless module continuously reads RSSI values.
-2. Signal strength data is collected and filtered.
-3. AI logic analyzes fluctuations and patterns.
-4. Based on decision rules, the system performs control actions.
-5. The output may trigger motors, alerts, switching systems, or navigation corrections.
-6. Continuous feedback improves system performance.
+| Virtual Pin | Function |
+|---|---|
+| V3 | Relay selection (1–5) |
+| V4 | System Active / Inactive |
+| V5 | AI Detection Status |
+| V6 | Head Count from AI |
 
 ---
 
-## Applications
+# RSSI Logic
 
-* Smart warehouses
-* Industrial automation
-* Indoor robot navigation
-* Asset tracking systems
-* Smart home automation
-* Hospital equipment tracking
-* Campus navigation systems
-* Security monitoring systems
+System activation depends on WiFi signal strength:
 
----
+RSSI > -60 dBm  → System ACTIVE  
+RSSI <= -60 dBm → System INACTIVE + Slider Reset
 
-## Future Improvements
+When the signal becomes weak:
 
-* Machine learning model optimization
-* Multi-node signal mapping
-* Cloud dashboard integration
-* Mobile app monitoring
-* GPS + RSSI hybrid navigation
-* Advanced predictive control
-* Improved noise filtering algorithms
+- System deactivates
+- Slider resets to 0
+- Receiver turns OFF all relays
+
+This prevents operation outside the defined WiFi range.
 
 ---
 
-## Repository Structure
+# Hardware Used
 
-```text
-RSSI-with-AI-Control/
-│
-├── code/
-│   └── main.ino
-│
-├── circuit_diagram/
-│   └── schematic.png
-│
-├── documentation/
-│   └── project_report.pdf
-│
-├── images/
-│   └── prototype.jpg
-│
-└── README.md
-```
+- ESP32 Dev Board × 2
+- 0.96" I2C OLED Display (SSD1306)
+- 5-Channel Relay Module
+- WiFi Router
+- Blynk IoT Platform
+- Optional AI Camera / Python Detection System
 
 ---
 
-## Installation
+# OLED Pin Connections
 
-1. Clone the repository
+## OLED → ESP32
 
-```bash
-git clone https://github.com/caffeinboy/RSSI-with-AI-Control.git
-```
-
-2. Open the project in Arduino IDE
-
-3. Install required libraries
-
-4. Select the correct board and COM port
-
-5. Upload the code to ESP32 / controller
-
-6. Monitor the output using Serial Monitor
+| OLED | ESP32 |
+|---|---|
+| VCC | 3.3V |
+| GND | GND |
+| SDA | GPIO 21 |
+| SCL | GPIO 22 |
 
 ---
 
-## Author
+# Relay Connections
 
-Developed as part of an Embedded Systems / IoT Engineering Project.
+## Receiver ESP32 Relay Pins
+
+| Relay | GPIO |
+|---|---|
+| Relay 1 | GPIO 5 |
+| Relay 2 | GPIO 18 |
+| Relay 3 | GPIO 19 |
+| Relay 4 | GPIO 23 |
+| Relay 5 | GPIO 25 |
 
 ---
 
-## License
+# Libraries Required
 
-This project is for academic, research, and development purposes.
+Install from Arduino Library Manager:
+
+- WiFi
+- Blynk
+- Adafruit GFX Library
+- Adafruit SSD1306
+- Wire
+- time.h (built-in)
 
 ---
 
+# Blynk Setup
+
+Create a Blynk Template with:
+
+Template Name: `publisher`
+
+Create the following widgets:
+
+- Slider → V3
+- Switch / Display → V4
+- AI Status → V5
+- Head Count → V6
+
+Use the generated:
+
+- `BLYNK_TEMPLATE_ID`
+- `BLYNK_TEMPLATE_NAME`
+- `BLYNK_AUTH_TOKEN`
+
+inside both ESP32 codes.
+
+---
+
+# Important Notes
+
+## Use Same Auth Token
+
+Both Publisher and Receiver must use the **same Blynk Auth Token** for real-time sync.
+
+Using separate tokens causes delayed updates and unstable synchronization.
+
+---
+
+## NTP Time
+
+Both ESP32 boards use NTP:
+
+configTime(19800, 0, "pool.ntp.org");
+
+This provides real-time clock display on OLED.
+
+---
+
+## Recommended Upload Settings
+
+For stable upload:
+
+- Board: ESP32 Dev Module
+- Upload Speed: 115200
+- Flash Frequency: 80MHz
+- Partition Scheme: Default
+
+Avoid high upload speeds like:
+
+921600
+
+This may cause:
+
+A fatal error occurred: The chip stopped responding
+
+---
+
+# Project Flow
+
+Publisher:  
+WiFi RSSI → V4 Logic → V3/V5/V6 → Blynk Cloud
+
+↓
+
+Receiver:  
+Blynk Cloud → Receive V3/V4/V5/V6 → Relay Control + OLED Display
+
+---
+
+# Serial Monitor Output Example
+
+WiFi Connected  
+Blynk Connected  
+V4 ACTIVE  
+V3 Updated: 3  
+AI: ON  
+People Count: 12  
+Relays updated  
+System Ready
+
+---
+
+# Future Improvements
+
+- MQTT instead of Blynk
+- Local server fallback
+- ESP-NOW backup communication
+- Database logging
+- Telegram alerts
+- AI camera direct integration
+- Mobile dashboard upgrade
+
+---
+
+# Author
+
+ESP32 + Blynk + RSSI + AI Automation Project  
+Smart Relay Control with Crowd Monitoring System
